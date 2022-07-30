@@ -1,0 +1,117 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreatePetInput {
+  category: String!
+  img: String
+  name: String
+  price: Float!
+  status: Boolean!
+  tags: String!
+}
+
+type LoggedUserOutput {
+  """Generated access_token of the user"""
+  access_token: String!
+}
+
+input LoginUserInput {
+  """email of the user"""
+  email: String!
+
+  """password of the user"""
+  password: String!
+}
+
+type Mutation {
+  buyPet(id: String!, shipDate: String!): OrderQL!
+  createPet(createPet: CreatePetInput!): PetQL!
+  deleteMe: UserQL!
+  deleteOrder(id: String!): OrderQL!
+  deletePet(id: String!): PetQL!
+  loginUser(LoginUserInput: LoginUserInput!): LoggedUserOutput!
+  signupUser(SignupUserInput: SignupUserInput!): LoggedUserOutput!
+  updateOrder(id: String!, status: String!): OrderQL!
+  updatePass(UpdatePassInput: UpdatePassInput!): UserQL!
+  updatePet(id: String!, updatePet: UpdatePetInput!): PetQL!
+  updateUser(UpdateUserInput: UpdateUserInput!): UserQL!
+  uploadImg: Boolean!
+}
+
+type OrderOutputQL {
+  ListPets: [PetQL!]!
+  User: UserQL!
+  id: String!
+  shipDate: String!
+  status: String!
+  total: Int!
+}
+
+type OrderQL {
+  id: String!
+  listPets: [PetQL!]!
+  shipDate: String!
+  status: String!
+  user: String!
+}
+
+type PetQL {
+  _id: String!
+  category: String!
+  img: String
+  name: String
+  price: Float!
+  status: Boolean!
+  tags: String!
+}
+
+type Query {
+  findUser(FindUserInput: String!): UserQL!
+  getAllPet: [PetQL!]!
+  getByStatus(status: Boolean!): [PetQL!]!
+  getOrder(id: String!): OrderOutputQL!
+  getPet(id: String!): PetQL!
+}
+
+input SignupUserInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  phone: String!
+  username: String!
+}
+
+input UpdatePassInput {
+  newPass: String!
+  oldPass: String!
+}
+
+input UpdatePetInput {
+  category: String!
+  img: String
+  name: String
+  price: Float!
+  status: Boolean!
+  tags: String!
+}
+
+input UpdateUserInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  phone: String!
+  username: String!
+}
+
+type UserQL {
+  _id: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  phone: String!
+  status: Boolean
+  username: String!
+}
