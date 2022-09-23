@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input BuyPetInput {
+  petId: String!
+  shipDate: String
+}
+
 input CreatePetInput {
   category: String!
   img: String
@@ -11,67 +16,67 @@ input CreatePetInput {
   tags: String!
 }
 
-type LoggedUserOutput {
-  """Generated access_token of the user"""
-  access_token: String!
+type JWT {
+  jwtPayload: JwtTokenPayload!
+  refreshToken: String!
+  token: String!
+}
+
+type JwtTokenPayload {
+  _id: String!
+  user: User!
 }
 
 input LoginUserInput {
-  """email of the user"""
-  email: String!
+  email: String
 
   """password of the user"""
   password: String!
+  phone: String
+  username: String
 }
 
 type Mutation {
-  buyPet(id: String!, shipDate: String!): OrderQL!
-  createPet(createPet: CreatePetInput!): PetQL!
-  deleteMe: UserQL!
-  deleteOrder(id: String!): OrderQL!
-  deletePet(id: String!): PetQL!
-  loginUser(LoginUserInput: LoginUserInput!): LoggedUserOutput!
-  signupUser(SignupUserInput: SignupUserInput!): LoggedUserOutput!
-  updateOrder(id: String!, status: String!): OrderQL!
-  updatePass(UpdatePassInput: UpdatePassInput!): UserQL!
-  updatePet(id: String!, updatePet: UpdatePetInput!): PetQL!
-  updateUser(UpdateUserInput: UpdateUserInput!): UserQL!
+  buyPet(BuyPetInput: BuyPetInput!): Order!
+  createPet(createPetInput: CreatePetInput!): Pet!
+  deleteMe: User!
+  deleteOrder(id: String!): Boolean!
+  deletePet(id: String!): Pet!
+  login(LoginUserInput: LoginUserInput!): JWT!
+  logout: Boolean!
+  signup(SignupUserInput: SignupUserInput!): JWT!
+  updateOrder(id: String!, status: String!): Order!
+  updatePass(UpdatePassInput: UpdatePassInput!): User!
+  updatePet(id: String!, updatePet: UpdatePetInput!): Pet!
+  updateUser(UpdateUserInput: UpdateUserInput!): User!
   uploadImg: Boolean!
 }
 
-type OrderOutputQL {
-  ListPets: [PetQL!]!
-  User: UserQL!
-  id: String!
-  shipDate: String!
-  status: String!
-  total: Int!
-}
-
-type OrderQL {
-  id: String!
-  listPets: [PetQL!]!
-  shipDate: String!
-  status: String!
-  user: String!
-}
-
-type PetQL {
+type Order {
   _id: String!
+  listPets: [Pet!]!
+  shipDate: String!
+  status: String!
+  total: Float!
+  user: User!
+}
+
+type Pet {
   category: String!
-  img: String
-  name: String
+  id: String!
+  name: String!
   price: Float!
   status: Boolean!
   tags: String!
 }
 
 type Query {
-  findUser(FindUserInput: String!): UserQL!
-  getAllPet: [PetQL!]!
-  getByStatus(status: Boolean!): [PetQL!]!
-  getOrder(id: String!): OrderOutputQL!
-  getPet(id: String!): PetQL!
+  findUser(Username: String!): User!
+  getAllPet: [Pet!]!
+  getByStatus(status: Boolean!): [Pet!]!
+  getByTags(tag: String!): [Pet!]!
+  getOrder(id: String!): Order!
+  getPet(id: String!): Pet!
 }
 
 input SignupUserInput {
@@ -89,29 +94,32 @@ input UpdatePassInput {
 }
 
 input UpdatePetInput {
-  category: String!
+  category: String
   img: String
   name: String
-  price: Float!
-  status: Boolean!
-  tags: String!
+  price: Float
+  status: Boolean
+  tags: String
 }
 
 input UpdateUserInput {
-  email: String!
-  firstName: String!
-  lastName: String!
-  phone: String!
-  username: String!
+  email: String
+  firstName: String
+  lastName: String
+  phone: String
+  username: String
 }
 
-type UserQL {
-  _id: String!
+type User {
+  _id: ID!
   email: String!
+  facebookId: String
   firstName: String!
   lastName: String!
   password: String!
-  phone: String!
-  status: Boolean
+  phone: String
+  refreshToken: String!
+  role: String!
+  status: Boolean!
   username: String!
 }

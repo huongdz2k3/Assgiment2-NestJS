@@ -7,42 +7,58 @@ import { SignupUserInput } from "src/auth/input/signup-user.input";
 import { UpdatePassInput } from "src/auth/input/updatepass.input";
 import { UpdateUserInput } from "src/auth/input/updateuser.input";
 import { LoggedUserOutput } from "src/auth/output/logged-user.output";
-import { CurrentUser } from "./user.decorator.graphql";
-import { UserQL } from "./user.schema";
-import { User } from "./users.model";
-@Resolver(of => UserQL)
+import { CurrentUser } from "./decorators/user.decorator.graphql";
+
+import { User } from "./model/users.model";
+import { JWT } from "src/auth/dto/auth.dto";
+import { UserService } from "./user.service";
+@Resolver(of => User)
 export class UserResolver {
-    constructor(private authService: AuthService) { }
-    @Mutation(() => LoggedUserOutput)
-    async loginUser(@Args('LoginUserInput') loginUserInput: LoginUserInput) {
-        const user = await this.authService.login(loginUserInput)
-        return this.authService.createToken(user)
-    }
-    @Mutation(() => LoggedUserOutput)
-    async signupUser(@Args('SignupUserInput') singupUserInput: SignupUserInput) {
-        return await this.authService.createToken(this.authService.signup(singupUserInput))
-    }
-    @UseGuards(JwtAuthGuard)
-    @Query(() => UserQL)
-    findUser(@Args('FindUserInput') username: string) {
-        return this.authService.findUser(username)
+    constructor(
+        private authService: AuthService,
+        private userService: UserService
+    ) { }
+    @Mutation(() => JWT)
+    async login(@Args('LoginUserInput') loginUserInput: LoginUserInput) {
+        return this.authService.login(loginUserInput)
     }
 
-    @Mutation(() => UserQL)
-    @UseGuards(JwtAuthGuard)
-    updatePass(@Args('UpdatePassInput') updatePassInput: UpdatePassInput, @CurrentUser() user: string) {
-        return this.authService.updatePass(updatePassInput.oldPass, updatePassInput.newPass, user)
+    @Mutation(() => JWT)
+    async signup(@Args('SignupUserInput') singupUserInput: SignupUserInput) {
+        return await this.authService.signup(singupUserInput)
     }
 
-    @Mutation(() => UserQL)
     @UseGuards(JwtAuthGuard)
-    updateUser(@Args('UpdateUserInput') updateUserInput: UpdateUserInput, @CurrentUser() username: string) {
-        return this.authService.updateUser(updateUserInput, username)
+    @Query(() => User)
+    async findUser(@Args('Username') username: string) {
+        return await this.userService.findUserByUsername(username)
     }
-    @Mutation(() => UserQL)
+
+    @Mutation(() => User)
     @UseGuards(JwtAuthGuard)
-    deleteMe(@CurrentUser() username: string) {
-        return this.authService.deleteMe(username)
+    updatePass(@Args('UpdatePassInput') updatePassInput: UpdatePassInput, @CurrentUser() user: any) {
+        const { username, id } = user
+        return this.authService.updatePass(updatePassInput, id)
+    }
+
+    @Mutation(() => User)
+    @UseGuards(JwtAuthGuard)
+    updateUser(@Args('UpdateUserInput') updateUserInput: UpdateUserInput, @CurrentUser() user: any) {
+        const { username, id } = user
+        return this.userService.updateUser(updateUserInput, id)
+    }
+    @Mutation(() => User)
+    @UseGuards(JwtAuthGuard)
+    deleteMe(@CurrentUser() user: any) {
+        const { username, id } = user
+        return this.userService.deleteMe(id)
+    }
+
+    @Mutation(() => Boolean)
+    @UseGuards(JwtAuthGuard)
+    logout(@CurrentUser() user: any) {
+        const { username, id } = user
+        return this.userService.logout(id)
     }
 
 }

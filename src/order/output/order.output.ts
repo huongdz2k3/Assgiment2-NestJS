@@ -1,7 +1,9 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { ObjectId } from "mongoose";
-import { PetQL } from "src/pet/pet.schema";
-import { UserQL } from "src/user/user.schema";
+import { Pet } from "src/pet/model/pet.model";
+
+import { User } from "src/user/model/users.model";
+
 
 @ObjectType()
 export class OrderOutputQL {
@@ -9,12 +11,12 @@ export class OrderOutputQL {
     id: string
     @Field()
     status: string
-    @Field(type => UserQL)
-    User: UserQL
+    @Field(type => User)
+    User: User
     @Field()
     shipDate: string
-    @Field(type => [PetQL])
-    ListPets: PetQL[]
+    @Field(type => [Pet])
+    ListPets: Pet[]
     @Field(type => Int)
     total: number
 

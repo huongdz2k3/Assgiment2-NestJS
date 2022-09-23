@@ -3,44 +3,64 @@ import { UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { Args, Resolver, Query, Mutation } from "@nestjs/graphql";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/guard/jwt-auth.guard";
-import { CreatePetInput } from "./input/createPet.input";
-import { UpdatePetInput } from "./input/updatePet.input";
-import { PetQL } from "./pet.schema"
+import { RolesGuard } from "src/auth/guard/roles.guard";
+import { Roles } from "src/user/decorators/roles.decorator";
+import { Role } from "src/user/role/role.enum";
+import { CreatePetInput, UpdatePetInput } from "./input/pet.input";
+
+import { Pet } from "./model/pet.model";
+
 import { PetService } from "./pet.service";
 // import { FileUpload } from "graphql-upload"
 
-@Resolver(of => PetQL)
+@Resolver(of => Pet)
 export class PetResolver {
     constructor(private petService: PetService) { }
 
-    @Query(returns => PetQL)
+    @Query(returns => Pet)
     async getPet(@Args('id') id: string) {
-        return this.petService.findPet(id)
+        return this.petService.findPetById(id)
     }
-    @Query(returns => [PetQL])
+
+    @Query(returns => [Pet])
     async getAllPet() {
-        return this.petService.getAllPet()
+        return await this.petService.getAllPet()
     }
-    @Query(returns => [PetQL])
+
+    @Query(returns => [Pet])
     async getByStatus(@Args('status') status: boolean) {
-        return this.petService.getByStatus(status)
+        return await this.petService.getByStatus(status)
     }
-    @UseGuards(JwtAuthGuard)
-    @Mutation(returns => PetQL)
-    async createPet(@Args('createPet') createPetInput: CreatePetInput) {
+
+    @Query(returns => [Pet])
+    async getByTags(@Args('tag') tag: string) {
+        return await this.petService.findPetByTags(tag)
+    }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
+    @Mutation(returns => Pet)
+    async createPet(@Args('createPetInput') createPetInput: CreatePetInput) {
         return this.petService.createPet(createPetInput)
     }
-    @UseGuards(JwtAuthGuard)
-    @Mutation(returns => PetQL)
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
+    @Mutation(returns => Pet)
     async updatePet(@Args('updatePet') updatePetInput: UpdatePetInput, @Args('id') id: string) {
-        return this.petService.updatePet(updatePetInput, id)
+        return await this.petService.updatePet(updatePetInput, id)
     }
-    @UseGuards(JwtAuthGuard)
-    @Mutation(returns => PetQL)
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
+    @Mutation(returns => Pet)
     async deletePet(@Args('id') id: string) {
-        return this.petService.deletePet(id)
+        return await this.petService.deletePet(id)
     }
-    @UseGuards(JwtAuthGuard)
+
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.Admin)
     @Mutation(() => Boolean)
     @UseInterceptors(FileInterceptor(__filename))
     async uploadImg(@UploadedFile() file: Express.Multer.File) {
